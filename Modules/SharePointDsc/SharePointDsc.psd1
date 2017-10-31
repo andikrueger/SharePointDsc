@@ -12,7 +12,7 @@
 # RootModule = ''
 
 # Version number of this module.
-ModuleVersion = '1.6.0.0'
+ModuleVersion = '1.9.0.0'
 
 # ID used to uniquely identify this module
 GUID = '6c1176a0-4fac-4134-8ca2-3fa8a21a7b90'
@@ -24,7 +24,7 @@ Author = 'Microsoft Corporation'
 CompanyName = 'Microsoft Corporation'
 
 # Copyright statement for this module
-Copyright = '(c) 2015-2016 Microsoft Corporation. All rights reserved.'
+Copyright = '(c) 2015-2017 Microsoft Corporation. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'This DSC module is used to deploy and configure SharePoint Server 2013 and 2016, and covers a wide range of areas including web apps, service apps and farm configuration.'
@@ -125,32 +125,9 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '
-* Updated SPWebApplication to allow Claims Authentication configuration
-* Updated documentation in regards to guidance on installing binaries from
-  network locations instead of locally
-* New resources: SPFarmPropertyBag
-* Bugfix in SPSite, which wasnt returing the quota template name in a correct way
-* Bugfix in SPAppManagementServiceApp which wasnt returning the correct database
-  name
-* Bugfix in SPAccessServiceApp which did not return the database server
-* Bugfix in SPDesignerSettings which filtered site collections with an incorrect
-  parameter
-* Updated the parameters in SPFarmSolution to use the full namespace
-* Bugfix in SPFarmsolution where it returned non declared parameters
-* Corrected typo in parameter name in Get method of SPFeature
-* Added check in SPHealAnalyzerRuleState for incorrect default rule schedule of
-  one rule
-* Improved check for CloudSSA in SPSearchServiceApp
-* Bugfix in SPSearchServiceApp in which the database and dbserver were not
-  returned correctly
-* Improved runtime of SPSearchTopology by streamlining wait processes
-* Fixed bug with SPSearchServiceApp that would throw an error about SDDL string
-* Improved output of test results for AppVeyor and VS Code based test runs
-* Fixed issue with SPWebAppPolicy if OS language is not En-Us
-* Added SPFarm resource, set SPCreateFarm and SPJoinFarm as deprecated to be
-  removed in version 2.0
-'
+        ReleaseNotes = "
+* New resource: SPServiceIdentity
+"
 
     } # End of PSData hashtable
 
