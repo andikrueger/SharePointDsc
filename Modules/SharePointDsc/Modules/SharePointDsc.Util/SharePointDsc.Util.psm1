@@ -20,6 +20,28 @@ function Add-SPDSCUserToLocalAdmin
     ([ADSI]"WinNT://$($env:computername)/Administrators,group").Add("WinNT://$domainName/$accountName") | Out-Null
 }
 
+function Clear-SPDscKerberosToken
+{
+    param (
+        [Parameter(Mandatory=$true)]
+        [System.String]
+        $Account
+    )
+
+    $sessions = klist sessions
+    foreach ($session in $sessions)
+    {
+        if ($session -like "*$($Account)*")
+        {
+            Write-Verbose -Message "Purging Kerberos ticket for $LogonId"
+            $LogonId = $session.split(' ')[3]
+            $LogonId = $LogonId.Replace('0:','')
+            klist -li $LogonId purge | Out-Null
+        }
+
+    }
+}
+
 function Convert-SPDscADGroupIDToName
 {
     param(
@@ -93,7 +115,29 @@ function Get-SPDSCAssemblyVersion
 }
 
 
-function Get-SPDSCFarmAccountName
+function Get-SPDscFarmAccount
+{
+    [CmdletBinding()]
+    param
+    ()
+
+    $farmaccount = (Get-SPFarm).DefaultServiceAccount.Name
+
+    $account = Get-SPManagedAccount | Where-Object -FilterScript { $_.UserName -eq $farmaccount }
+
+    $bindings = [System.Reflection.BindingFlags]::CreateInstance -bor `
+                [System.Reflection.BindingFlags]::GetField -bor `
+                [System.Reflection.BindingFlags]::Instance -bor `
+                [System.Reflection.BindingFlags]::NonPublic
+
+    $pw = $account.GetType().GetField("m_Password", $bindings).GetValue($account);
+
+    return New-Object -TypeName System.Management.Automation.PSCredential `
+                      -ArgumentList $farmaccount, $pw.SecureStringValue
+}
+
+
+function Get-SPDscFarmAccountName
 {
     [CmdletBinding()]
     param
@@ -836,6 +880,77 @@ function Remove-SPDSCGenericObject
         $Target
     )
     $SourceCollection.Remove($Target)
+}
+
+function Format-OfficePatchGUID
+{
+    [CmdletBinding()]
+    param(
+        [parameter(Mandatory = $true)]
+        [String]
+        $PatchGUID
+    )
+
+    $guidParts = $PatchGUID.Split("-")
+    if($guidParts.Count -ne 5 `
+        -or $guidParts[0].Length -ne 8 `
+        -or $guidParts[1].Length -ne 4 `
+        -or $guidParts[2].Length -ne 4 `
+        -or $guidParts[3].Length -ne 4 `
+        -or $guidParts[4].Length -ne 12)
+    {
+        throw "The provided Office Patch GUID is not in the expected format (e.g. XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+    }
+
+    $newPart1 = ConvertTo-ReverseString -InputString $guidParts[0]
+    $newPart2 = ConvertTo-ReverseString -InputString $guidParts[1]
+    $newPart3 = ConvertTo-ReverseString -InputString $guidParts[2]
+    $newPart4 = ConvertTo-TwoDigitFlipString -InputString $guidParts[3]
+    $newPart5 = ConvertTo-TwoDigitFlipString -InputString $guidParts[4]
+
+    $newGUID = $newPart1 + $newPart2 +$newPart3 + $newPart4 + $newPart5
+    return $newGUID
+}
+
+function ConvertTo-TwoDigitFlipString
+{
+    [CmdletBinding()]
+    param(
+        [parameter(Mandatory = $true)]
+        [string]
+        $InputString
+    )
+
+    if($InputString.Length % 2 -ne 0)
+    {
+        throw "The input string was not in the correct format. It needs to have an even length."
+    }
+
+    $flippedString = ""
+
+    for($i = 0; $i -lt $InputString.Length; $i++)
+    {
+        $flippedString += $InputString[$i+1] + $InputString[$i]
+        $i++
+    }
+    return $flippedString
+}
+
+function ConvertTo-ReverseString
+{
+    [CmdletBinding()]
+    param(
+        [parameter(Mandatory = $true)]
+        [string]
+        $InputString
+    )
+
+    $reverseString = ""
+    for($i = $InputString.Length - 1; $i -ge 0; $i--)
+    {
+        $reverseString += $InputString[$i]
+    }
+    return $reverseString
 }
 
 Export-ModuleMember -Function *
