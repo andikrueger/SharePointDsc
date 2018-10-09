@@ -24,7 +24,7 @@
                 Description = "" #implementation isn't using it yet
                 PolicySetting = "Mandatory"
                 PrivacySetting = "Public"
-                PropertyMappings = @[
+                PropertyMappings = @(
                     MSFT_SPUserProfilePropertyMapping {
                         ConnectionName = "contoso.com"
                         PropertyName = "mail"
@@ -35,7 +35,7 @@
                         PropertyName = "mail"
                         Direction = "Import"
                     }
-                ]
+                )
                 Length = 10
                 DisplayOrder =25
                 IsEventLog =$false
