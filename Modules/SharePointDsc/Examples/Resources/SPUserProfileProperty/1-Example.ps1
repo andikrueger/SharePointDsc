@@ -4,7 +4,7 @@
     app
 #>
 
-    Configuration Example 
+    Configuration Example
     {
         param(
             [Parameter(Mandatory = $true)]
@@ -24,20 +24,29 @@
                 Description = "" #implementation isn't using it yet
                 PolicySetting = "Mandatory"
                 PrivacySetting = "Public"
-                MappingConnectionName = "contoso.com"
-                MappingPropertyName = "mail"
-                MappingDirection = "Import"
+                PropertyMappings = @[
+                    MSFT_SPUserProfilePropertyMapping {
+                        ConnectionName = "contoso.com"
+                        PropertyName = "mail"
+                        Direction = "Import"
+                    },
+                    MSFT_SPUserProfilePropertyMapping {
+                        ConnectionName = "contoso-employees.com"
+                        PropertyName = "mail"
+                        Direction = "Import"
+                    }
+                ]
                 Length = 10
-                DisplayOrder =25 
+                DisplayOrder =25
                 IsEventLog =$false
                 IsVisibleOnEditor=$true
                 IsVisibleOnViewer = $true
                 IsUserEditable = $true
-                IsAlias = $false 
-                IsSearchable = $false 
+                IsAlias = $false
+                IsSearchable = $false
                 TermStore = ""
                 TermGroup = ""
-                TermSet = "" 
+                TermSet = ""
                 UserOverridePrivacy = $false
                 PsDscRunAsCredential = $SetupAccount
             }

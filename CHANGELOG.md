@@ -41,6 +41,8 @@ resources:
   * SPWebAppSiteUseAndDeletion
   * SPWebAppThrottlingSettings
   * SPWebAppWorkflowSettings
+* SPUserProfileProperty
+  * Added support for several mapping connections
 
 ## Unreleased
 
